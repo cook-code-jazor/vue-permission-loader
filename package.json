@@ -1,5 +1,5 @@
 {
-  "name": "@jazor/vue-permission-loader",
+  "name": "vue-permission-loader",
   "version": "1.0.0",
   "description": "loader for vue permission",
   "main": "index.js",
