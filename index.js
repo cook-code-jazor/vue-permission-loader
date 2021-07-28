@@ -11,20 +11,20 @@ function GRANT (grant_groups, include, mode) {
 	for (let index  = 0; index < grant_groups.length; index++) {
 		const ele = grant_groups[index]
 		if (!groups.hasOwnProperty(ele)) throw new Error(`Group[${ele}] can not be found`);
-		
+
 		const allowedModes = groups[ele]
 
-		if (include == 1 && allowedModes.indexOf(mode) >= 0) return true;
+		if (include === 1 && allowedModes.indexOf(mode) >= 0) return true;
 
-		if (include == 0 && allowedModes.indexOf(mode) >= 0) return false;
+		if (include === 0 && allowedModes.indexOf(mode) >= 0) return false;
 
 	}
-	return include == 1 ? false : true
+	return include !== 1
 }
 
 function processTemplate (template, startTag, endTag) {
 	startTag = startTag || '<!--'
-	endTag = endTag || '-->' 
+	endTag = endTag || '-->'
 	const results = [];
 	const startTagLength = startTag.length
 	const endTagLength = endTag.length
@@ -38,9 +38,14 @@ function processTemplate (template, startTag, endTag) {
 		let foundEnd = template.indexOf('}}' + endTag, nextPosition)
 		if (foundEnd === -1) throw new Error('GRANT ERROR(BEGIN GRANT ERROR), At: ' + template)
 
-		
-		
+
+
 		let grandEnd = template.indexOf(startTag + '{{END GRANT}}' + endTag, foundEnd)
+		let endGrantLength = 13;
+		if (grandEnd === -1) {
+			grandEnd = template.indexOf(startTag + '{{END}}' + endTag, foundEnd)
+			endGrantLength = 7;
+		}
 		if (grandEnd === -1) throw new Error('GRANT ERROR(NO END GRANT), At: ' + template)
 
 		let command = template.substr(foundPosition + 8 + startTagLength, foundEnd - foundPosition - 8 - startTagLength)
@@ -48,13 +53,13 @@ function processTemplate (template, startTag, endTag) {
 		let contents = template.substr(foundEnd + 2 + endTagLength, grandEnd - foundEnd - 2 - endTagLength);
 
 		results.push(template.substr(nextPosition, foundPosition - nextPosition));
-		
+
 		const grantd = (new Function("MODE", "GRANT", "INCLUDE", "EXCLUDE", 'return ' + command))(globalMode, GRANT, INCLUDE, EXCLUDE)
 		if (grantd === true) {
 			results.push(contents);
 		}
 
-		nextPosition = grandEnd + 13 + startTagLength + endTagLength
+		nextPosition = grandEnd + endGrantLength + startTagLength + endTagLength
 
 	}
 	if (nextPosition < template.length) {
