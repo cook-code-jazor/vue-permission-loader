@@ -1,6 +1,6 @@
 {
   "name": "vue-permission-loader",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "loader for vue permission",
   "main": "index.js",
   "scripts": {

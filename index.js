@@ -1,5 +1,6 @@
 const path = require('path')
-const groups = require(path.resolve('./groups.json'))
+const fs = require('fs')
+let groups = null;
 const globalMode = process.env.VUE_APP_ENV || ''
 const INCLUDE = 1;
 const EXCLUDE = 0;
@@ -68,8 +69,20 @@ function processTemplate (template, startTag, endTag) {
 	return results.join('')
 
 }
-module.exports = (template) => {
+function loadGroups(){
+	const paths = [path.resolve('./groups.json'), path.resolve('../groups.json')];
 
+	for (let i = 0; i < paths.length; i++){
+		try {
+			groups = require(paths[i])
+			return
+		}catch (e) {
+			if(i === paths.length - 1 ) throw e;
+		}
+	}
+}
+module.exports = (template) => {
+	if(groups === null) loadGroups();
 	if (!globalMode) return template;
 
 	template = processTemplate(template)
