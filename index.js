@@ -43,10 +43,7 @@ function processTemplate (template, startTag, endTag) {
 
 		let grandEnd = template.indexOf(startTag + '{{END GRANT}}' + endTag, foundEnd)
 		let endGrantLength = 13;
-		if (grandEnd === -1) {
-			grandEnd = template.indexOf(startTag + '{{END}}' + endTag, foundEnd)
-			endGrantLength = 7;
-		}
+
 		if (grandEnd === -1) throw new Error('GRANT ERROR(NO END GRANT), At: ' + template)
 
 		let command = template.substr(foundPosition + 8 + startTagLength, foundEnd - foundPosition - 8 - startTagLength)
