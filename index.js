@@ -1,5 +1,6 @@
 const path = require('path')
 const fs = require('fs')
+const { getOptions } = require('loader-utils');
 let groups = null;
 const globalMode = process.env.VUE_APP_ENV || ''
 const INCLUDE = 1;
@@ -66,8 +67,11 @@ function processTemplate (template, startTag, endTag) {
 	return results.join('')
 
 }
-function loadGroups(){
+function loadGroups(options){
 	const paths = [path.resolve('./groups.json'), path.resolve('../groups.json')];
+	if(options.hasOwnProperty('groups')){
+		paths.unshift(options.groups)
+	}
 
 	for (let i = 0; i < paths.length; i++){
 		try {
@@ -78,8 +82,9 @@ function loadGroups(){
 		}
 	}
 }
-module.exports = (template) => {
-	if(groups === null) loadGroups();
+module.exports = function(template) {
+	const options = getOptions(this) || {};
+	if(groups === null) loadGroups(options);
 	if (!globalMode) return template;
 
 	template = processTemplate(template)
